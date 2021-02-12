@@ -1,21 +1,56 @@
-import React from 'react'
-import { Route } from 'react-router-dom'
-import ListBooks from './ListBooks'
-import SearchBooks from './SearchBooks'
-import * as BooksAPI from './BooksAPI'
-import './App.css'
+import React from 'react';
+import { Route } from 'react-router-dom';
+import ListBooks from './ListBooks';
+import SearchBooks from './SearchBooks';
+import * as BooksAPI from './BooksAPI';
+import './App.css';
 
 class BooksApp extends React.Component {
   state = {
-    /**
-     * TODO: Instead of using this state variable to keep track of which page
-     * we're on, use the URL in the browser's address bar. This will ensure that
-     * users can use the browser's back and forward buttons to navigate between
-     * pages, as well as provide a good URL they can bookmark and share.
-     */
     myBooks: [],
     searchResults: [],
-  }
+    hasError: false
+  };
+
+  componentDidMount = () => {
+    BooksAPI.getAll()
+      .then(books => {
+        this.setState(() => ({
+          myBooks: books
+        }))
+      });
+  };
+
+  resetSearch = () => {
+    this.setState({searchResults: []});
+  };
+
+  changeBookShelf = (book, shelf) => {
+    BooksAPI.update(book, shelf);
+
+    if (shelf == "None") {
+      this.setState(prevState => ({
+        myBooks: prevState.myBooks.filter(b => b.id !== book.id)
+      }))
+    } else {
+      book.shelf = shelf;
+      this.setState(prevState => ({
+        myBooks: prevState.myBooks.filter(b => b.id !== book.id).concat(book)
+      }))
+    }
+  };
+
+  searchBooks = (query) => {
+    if (query) {
+      BooksAPI.search(query)
+        .then(books => {
+          this.setState({searchResults: books });
+      });
+    } else {
+      this.setState({searchResults: [] });
+    }
+  };
+
 
   render() {
     const bookshelves = [
@@ -30,18 +65,28 @@ class BooksApp extends React.Component {
           exact
           path='/'
           render={() => (
-            <ListBooks />
+            <ListBooks
+              bookShelves={bookshelves}
+              books={this.state.myBooks}
+              onShelfChange={this.changeBookShelf}
+            />
           )}
         />
         <Route
           exact
           path='/search'
           render={() => (
-            <SearchBooks />
+            <SearchBooks
+              onResetSearch={this.resetSearch}
+              onSearch={this.searchBooks}
+              searchResults={this.state.searchResults}
+              books={this.state.myBooks}
+              onShelfChange={this.changeBookShelf}
+            />
           )}
         />
       </div>
-    )
+    );
   }
 }
 

@@ -1,30 +1,37 @@
-import React from 'react'
+import React from 'react';
+import { Link } from 'react-router-dom';
+import SearchBooksInput from './SearchBooksInput'
+import BooksGrid from "./BooksGrid";
 
-class SearchBooks extends React.Component {
-  render() {
-    return (
-      <div className="search-books">
-            <div className="search-books-bar">
-              <button className="close-search" onClick={() => this.setState({ showSearchPage: false })}>Close</button>
-              <div className="search-books-input-wrapper">
-                {/*
-                  NOTES: The search from BooksAPI is limited to a particular set of search terms.
-                  You can find these search terms here:
-                  https://github.com/udacity/reactnd-project-myreads-starter/blob/master/SEARCH_TERMS.md
+const SearchBooks = props => {
+  const {onResetSearch, onSearch, searchResults, books, onShelfChange} = props;
+  
+  const updatedShelfBooks = searchResults.map(book => {
+    books.map(b => {
+      if (b.id === book.id) {
+        book.shelf = b.shelf;
+      }
+      return b;
+    });
+    return book;
+  });
 
-                  However, remember that the BooksAPI.search method DOES search by title or author. So, don't worry if
-                  you don't find a specific author or title. Every search is limited by search terms.
-                */}
-                <input type="text" placeholder="Search by title or author"/>
-
-              </div>
-            </div>
-            <div className="search-books-results">
-              <ol className="books-grid"></ol>
-            </div>
-          </div>
-    )
-  }
+  return (
+    <div className="search-books">
+      <div className="search-books-bar">
+        <Link to="/">
+          <button className="close-search" onClick={onResetSearch}>Close</button>
+        </Link>
+        <SearchBooksInput onSearch={onSearch} />
+      </div>
+      <div className="search-books-results">
+        <BooksGrid 
+          books={updatedShelfBooks} 
+          onShelfChange={onShelfChange}
+        />
+      </div>
+    </div>
+  )
 }
 
 export default SearchBooks
