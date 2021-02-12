@@ -5,7 +5,6 @@ import BooksGrid from "./BooksGrid";
 
 const SearchBooks = props => {
   const {onResetSearch, onSearch, searchResults, books, onShelfChange} = props;
-  
   const updatedShelfBooks = searchResults.map(book => {
     books.map(b => {
       if (b.id === book.id) {

@@ -3,14 +3,13 @@ import * as BooksAPI from './BooksAPI';
 
 class SearchBooksInput extends React.Component {
   state = {
-    searchQuery: '',
+    searchQuery: ''
   };
 
   handleQuery = (searchQuery) => {
-    this.setState(() => ({
-      searchQuery: searchQuery.trim()
-    }));
-
+    this.setState(
+      {searchQuery: searchQuery},
+    );
     this.props.onSearch(searchQuery);
   };
 
@@ -23,6 +22,7 @@ class SearchBooksInput extends React.Component {
             placeholder="Search by title, author, or genre" 
             value={searchQuery}
             onChange={(event) => this.handleQuery(event.target.value)}
+            autoFocus
           />
         </div>
       )

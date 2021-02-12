@@ -22,13 +22,15 @@ class BooksApp extends React.Component {
   };
 
   resetSearch = () => {
-    this.setState({searchResults: []});
+    this.setState(
+      {searchResults: []}
+    );
   };
 
   changeBookShelf = (book, shelf) => {
     BooksAPI.update(book, shelf);
 
-    if (shelf == "None") {
+    if (shelf === "None") {
       this.setState(prevState => ({
         myBooks: prevState.myBooks.filter(b => b.id !== book.id)
       }))
@@ -44,19 +46,27 @@ class BooksApp extends React.Component {
     if (query) {
       BooksAPI.search(query)
         .then(books => {
-          this.setState({searchResults: books });
+          if (books.error) {
+            this.setState(
+              {searchResults: []}
+            );
+          } else {
+            this.setState(
+              {searchResults: books}
+            );
+          }
       });
     } else {
-      this.setState({searchResults: [] });
+      this.setState({searchResults: []});
     }
   };
 
 
   render() {
     const bookshelves = [
-      { key: 'currentlyReading', name: 'Currently Reading' },
-      { key: 'wantToRead', name: 'Want to Read' },
-      { key: 'read', name: 'Read' }
+      {key: 'currentlyReading', name: 'Currently Reading'},
+      {key: 'wantToRead', name: 'Want to Read'},
+      {key: 'read', name: 'Read'}
     ];
 
     return (
