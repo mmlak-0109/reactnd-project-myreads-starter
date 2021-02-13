@@ -1,5 +1,6 @@
 import React from 'react';
 import { Route } from 'react-router-dom';
+import { debounce } from 'throttle-debounce';
 import ListBooks from './ListBooks';
 import SearchBooks from './SearchBooks';
 import * as BooksAPI from './BooksAPI';
@@ -9,7 +10,7 @@ class BooksApp extends React.Component {
   state = {
     myBooks: [],
     searchResults: [],
-    hasError: false
+    searchReturnedBooks: true
   };
 
   componentDidMount = () => {
@@ -30,40 +31,46 @@ class BooksApp extends React.Component {
   changeBookShelf = (book, shelf) => {
     BooksAPI.update(book, shelf);
 
-    if (shelf === "None") {
+    if (shelf === "none") {
       this.setState(prevState => ({
         myBooks: prevState.myBooks.filter(b => b.id !== book.id)
-      }))
+      }));
     } else {
       book.shelf = shelf;
       this.setState(prevState => ({
         myBooks: prevState.myBooks.filter(b => b.id !== book.id).concat(book)
-      }))
+      }));
     }
   };
 
-  searchBooks = (query) => {
+  searchBooks = debounce(300, false, query => {
     if (query) {
       BooksAPI.search(query)
         .then(books => {
+          // when books aren't returned
           if (books.error) {
             this.setState(
-              {searchResults: []}
+              {searchResults: [],
+               searchReturnedBooks: false}
             );
           } else {
             this.setState(
-              {searchResults: books}
+              {searchResults: books,
+               searchReturnedBooks: true}
             );
           }
       });
     } else {
-      this.setState({searchResults: []});
+      // reset when query empty
+      this.setState(
+        {searchResults: [],
+         searchReturnedBooks: true});
     }
-  };
+  });
 
 
   render() {
-    const bookshelves = [
+    const bookShelves = [
       {key: 'currentlyReading', name: 'Currently Reading'},
       {key: 'wantToRead', name: 'Want to Read'},
       {key: 'read', name: 'Read'}
@@ -76,7 +83,7 @@ class BooksApp extends React.Component {
           path='/'
           render={() => (
             <ListBooks
-              bookShelves={bookshelves}
+              bookShelves={bookShelves}
               books={this.state.myBooks}
               onShelfChange={this.changeBookShelf}
             />
@@ -92,12 +99,13 @@ class BooksApp extends React.Component {
               searchResults={this.state.searchResults}
               books={this.state.myBooks}
               onShelfChange={this.changeBookShelf}
+              searchReturnedBooks={this.state.searchReturnedBooks}
             />
           )}
         />
       </div>
-    );
-  }
+    )
+  };
 }
 
 export default BooksApp

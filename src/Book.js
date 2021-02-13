@@ -14,9 +14,10 @@ const Book = props => {
             width: 128,
             height: 193,
             backgroundImage: `url(${
+              // use API included image if available, else use replacement
               book.imageLinks
                 ? book.imageLinks.thumbnail
-                : 'icons/No_image_available.png'
+                : 'icons/No_image_available_450_x_600.svg' //from https://commons.wikimedia.org/wiki/File:No_image_available_450_x_600.svg
               })`}}>
         </div>
         <BookShelfChanger 
@@ -26,8 +27,10 @@ const Book = props => {
         />
       </div>
       <div className="book-title">{book.title}</div>
-      <div className="book-authors">
-        {book.authors ? book.authors.join(', ') : "Unknown"}
+      <div className="book-authors">{
+        // return "Unknown" when "authors" is missing from any books
+        book.authors ? book.authors.join(', ') : "Unknown"
+        }
       </div>
       </div>
     </li>

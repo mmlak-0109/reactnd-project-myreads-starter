@@ -1,10 +1,10 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import SearchBooksInput from './SearchBooksInput'
+import SearchBooksInput from './SearchBooksInput';
 import BooksGrid from "./BooksGrid";
 
 const SearchBooks = props => {
-  const {onResetSearch, onSearch, searchResults, books, onShelfChange} = props;
+  const {onResetSearch, onSearch, searchResults, books, onShelfChange, searchReturnedBooks} = props;
   const updatedShelfBooks = searchResults.map(book => {
     books.map(b => {
       if (b.id === book.id) {
@@ -24,10 +24,13 @@ const SearchBooks = props => {
         <SearchBooksInput onSearch={onSearch} />
       </div>
       <div className="search-books-results">
-        <BooksGrid 
-          books={updatedShelfBooks} 
-          onShelfChange={onShelfChange}
-        />
+        {searchReturnedBooks
+          ? <BooksGrid 
+              books={updatedShelfBooks} 
+              onShelfChange={onShelfChange}
+            />
+          : <p>Sorry, your search didn't find any books.  Please try again.</p>
+          }
       </div>
     </div>
   )

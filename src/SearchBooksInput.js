@@ -26,7 +26,7 @@ class SearchBooksInput extends React.Component {
           />
         </div>
       )
-  }
+  };
 }
 
 export default SearchBooksInput
